@@ -1,11 +1,13 @@
+import os
 import json
 from datetime import datetime
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 from database import get_db, init_db
+from seed_data import seed_all
 from auth import (
     hash_password,
     verify_password,
@@ -21,10 +23,31 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for local Vite frontend
+# Configure CORS: allow production Vercel domain, Vercel preview deploys, local dev, and env overrides
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
+frontend_url_env = os.getenv("FRONTEND_URL", "")
+
+origins = [
+    "https://venturebridge01.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+for extra in [frontend_url_env, allowed_origins_env]:
+    if extra:
+        for u in extra.split(","):
+            cleaned = u.strip().rstrip("/")
+            if cleaned and cleaned not in origins:
+                origins.append(cleaned)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,6 +56,32 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     init_db()
+    # Auto-seed if AUTO_SEED is enabled (default true to ensure demo personas work on fresh deploys)
+    auto_seed_env = os.getenv("AUTO_SEED", "true").lower()
+    if auto_seed_env in ("true", "1", "yes"):
+        try:
+            seed_all()
+        except Exception as e:
+            print(f"Startup notice: Seeding check completed ({e})")
+
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "app": "VentureBridge API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+@app.get("/health")
+@app.get("/api/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "app": "VentureBridge API",
+        "timestamp": datetime.now().isoformat()
+    }
 
 # ==========================================
 # PYDANTIC SCHEMAS

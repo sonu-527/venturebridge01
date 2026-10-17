@@ -23,10 +23,50 @@ def request(method, path, body=None, token=None):
         except:
             return e.code, {"raw": err_body}
 
+def check_cors_and_health():
+    print("\n0. Testing Health Checks and CORS Configuration...")
+    # Root
+    status, res = request("GET", "/")
+    assert status == 200, f"Root endpoint failed: {res}"
+    assert res.get("status") == "online"
+    print("  [PASS] Root endpoint '/' returned online status")
+
+    # /health
+    status, res = request("GET", "/health")
+    assert status == 200, f"/health endpoint failed: {res}"
+    assert res.get("status") == "healthy"
+    print("  [PASS] Health check '/health' returned healthy status")
+
+    # /api/health
+    status, res = request("GET", "/api/health")
+    assert status == 200, f"/api/health endpoint failed: {res}"
+    assert res.get("status") == "healthy"
+    print("  [PASS] Proxy health check '/api/health' returned healthy status")
+
+    # CORS preflight with Vercel origin
+    req = urllib.request.Request(
+        f"{BASE_URL}/api/auth/login",
+        headers={
+            "Origin": "https://venturebridge01.vercel.app",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "Content-Type"
+        },
+        method="OPTIONS"
+    )
+    with urllib.request.urlopen(req) as resp:
+        assert resp.status == 200
+        headers_dict = dict(resp.headers)
+        allow_origin = headers_dict.get("access-control-allow-origin") or headers_dict.get("Access-Control-Allow-Origin")
+        assert allow_origin == "https://venturebridge01.vercel.app", f"CORS allow origin mismatch: {allow_origin}"
+        print(f"  [PASS] CORS preflight for 'https://venturebridge01.vercel.app' verified ({allow_origin})")
+
 def run_tests():
     print("==========================================")
     print("VENTUREBRIDGE COMPREHENSIVE INTEGRATION TEST")
     print("==========================================")
+
+    # 0. Health & CORS
+    check_cors_and_health()
 
     # 1. Login with demo accounts
     print("\n1. Testing Login for 3 Roles...")

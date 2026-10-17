@@ -145,14 +145,90 @@ EntEmp/
 
 ---
 
-## 🧪 Testing
+## ☁️ Production Deployment Guide
 
-Run the automated integration test suite to verify all 9 core subsystems:
+VentureBridge is pre-configured for continuous deployment with **Render** (FastAPI backend) and **Vercel** (Vite frontend).
+
+### 1. Backend Deployment on Render
+
+1. **Sign in to Render**: Navigate to [dashboard.render.com](https://dashboard.render.com) and click **New + > Web Service**.
+2. **Connect Repository**: Select `sonu-527/venturebridge01` (Branch: `main`).
+3. **Configure Service Settings**:
+   - **Name**: `venturebridge-api` (or your choice)
+   - **Region**: Closest to your users (e.g., Oregon, Frankfurt)
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. **Configure Environment Variables**:
+   In **Environment Variables**, add:
+   | Variable | Value | Notes |
+   | :--- | :--- | :--- |
+   | `JWT_SECRET` | *(Generate a 32+ character random string)* | Secret for signing JWT authentication tokens |
+   | `ALLOWED_ORIGINS` | `https://venturebridge01.vercel.app` | Comma-separated list of allowed frontend origins |
+   | `AUTO_SEED` | `true` | Automatically seeds demo personas & startups if DB is empty |
+   | `DATABASE_URL` | *(Optional, see Database Persistence below)* | Connection string for Render PostgreSQL |
+5. **Health Check Path**:
+   Set Health Check Path to: `/health` (or `/api/health`).
+6. **Deploy**: Click **Create Web Service**. Once deployed, copy your Render service URL (e.g., `https://venturebridge-api.onrender.com`).
+
+#### 🗄️ Database Persistence on Render
+- **Default (SQLite)**: By default, the application runs on SQLite (`venturebridge.db`). Note that Render Free web services have ephemeral storage, meaning changes are reset when the service restarts.
+- **Production Persistence (PostgreSQL)**:
+  1. In Render, click **New + > PostgreSQL**.
+  2. Set database name (e.g., `venturebridge_db`).
+  3. Copy the **Internal Database URL** (if backend is on Render) or **External Database URL**.
+  4. Paste it as `DATABASE_URL` in your Web Service environment variables.
+  5. The backend automatically detects PostgreSQL, sets up the full schema, and seeds demo personas on first launch!
+
+---
+
+### 2. Frontend Deployment on Vercel
+
+The frontend is already linked to Vercel at `https://venturebridge01.vercel.app`.
+
+To ensure the frontend communicates with your Render backend (fixing the demo login HTTP 404):
+
+1. **Open Vercel Project**: Go to [vercel.com](https://vercel.com) and open your `venturebridge01` project.
+2. **Project Settings**:
+   - **Root Directory**: `frontend`
+   - **Framework Preset**: `Vite`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+3. **Environment Variables**:
+   Under **Settings > Environment Variables**, add:
+   - **Key**: `VITE_API_BASE_URL`
+   - **Value**: `https://<your-render-backend-name>.onrender.com` (replace with your actual Render URL, without trailing slash)
+   - Apply to: **Production**, **Preview**, and **Development**
+4. **Redeploy**: Go to **Deployments > ... > Redeploy** to bake the new `VITE_API_BASE_URL` into the production build.
+
+> **Why Demo Login Returned 404 Previously:**
+> The frontend was previously requesting `/api/auth/login` on the Vercel domain (`https://venturebridge01.vercel.app/api/auth/login`), where no backend proxy existed. Setting `VITE_API_BASE_URL` directs all authentication and API calls to your live Render backend, while the new `frontend/vercel.json` SPA rewrite rule prevents client-side routing 404s on page refresh.
+
+---
+
+## 🧪 Testing & Verification
+
+Run the automated integration test suite against the local or remote backend:
 ```bash
 cd backend
 python test_integration.py
 ```
 Expected output:
 ```
+==========================================
+VENTUREBRIDGE COMPREHENSIVE INTEGRATION TEST
+==========================================
+
+0. Testing Health Checks and CORS Configuration...
+  [PASS] Root endpoint '/' returned online status
+  [PASS] Health check '/health' returned healthy status
+  [PASS] Proxy health check '/api/health' returned healthy status
+  [PASS] CORS preflight for 'https://venturebridge01.vercel.app' verified
+
+...
+
+==========================================
 ALL 9 INTEGRATION TEST SUITES PASSED (100% SUCCESS)!
+==========================================
 ```

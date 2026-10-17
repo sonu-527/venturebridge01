@@ -24,6 +24,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickLoginOpen, setQuickLoginOpen] = useState(false);
 
+  const handleQuickDemo = async (role: 'entrepreneur' | 'job_seeker' | 'investor', dashboardRoute: string) => {
+    try {
+      await quickLogin(role);
+      setCurrentPage(dashboardRoute);
+    } catch (err: any) {
+      alert(`Demo Login: ${err.message || 'Failed to authenticate demo user'}`);
+    }
+  };
+
   const getDashboardRoute = () => {
     if (!user) return 'login';
     if (user.role === 'entrepreneur') return 'entrepreneur-dashboard';
@@ -108,8 +117,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
                   </div>
                   <button
                     onClick={() => {
-                      quickLogin('entrepreneur');
-                      setCurrentPage('entrepreneur-dashboard');
+                      setQuickLoginOpen(false);
+                      handleQuickDemo('entrepreneur', 'entrepreneur-dashboard');
                     }}
                     className="w-full text-left px-3.5 py-2 hover:bg-[#F8FAF8] flex items-center justify-between group"
                   >
@@ -121,8 +130,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
                   </button>
                   <button
                     onClick={() => {
-                      quickLogin('job_seeker');
-                      setCurrentPage('jobseeker-dashboard');
+                      setQuickLoginOpen(false);
+                      handleQuickDemo('job_seeker', 'jobseeker-dashboard');
                     }}
                     className="w-full text-left px-3.5 py-2 hover:bg-[#F8FAF8] flex items-center justify-between group"
                   >
@@ -134,8 +143,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
                   </button>
                   <button
                     onClick={() => {
-                      quickLogin('investor');
-                      setCurrentPage('investor-dashboard');
+                      setQuickLoginOpen(false);
+                      handleQuickDemo('investor', 'investor-dashboard');
                     }}
                     className="w-full text-left px-3.5 py-2 hover:bg-[#F8FAF8] flex items-center justify-between group"
                   >
@@ -286,9 +295,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
             <div className="flex gap-1.5 px-2">
               <button
                 onClick={() => {
-                  quickLogin('entrepreneur');
-                  setCurrentPage('entrepreneur-dashboard');
                   setMobileMenuOpen(false);
+                  handleQuickDemo('entrepreneur', 'entrepreneur-dashboard');
                 }}
                 className="flex-1 py-1 text-[11px] font-medium bg-[#EAF7EF] text-[#08663A] rounded border border-[#138A4B]/20 text-center"
               >
@@ -296,9 +304,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
               </button>
               <button
                 onClick={() => {
-                  quickLogin('job_seeker');
-                  setCurrentPage('jobseeker-dashboard');
                   setMobileMenuOpen(false);
+                  handleQuickDemo('job_seeker', 'jobseeker-dashboard');
                 }}
                 className="flex-1 py-1 text-[11px] font-medium bg-[#EAF7EF] text-[#08663A] rounded border border-[#138A4B]/20 text-center"
               >
@@ -306,9 +313,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) =
               </button>
               <button
                 onClick={() => {
-                  quickLogin('investor');
-                  setCurrentPage('investor-dashboard');
                   setMobileMenuOpen(false);
+                  handleQuickDemo('investor', 'investor-dashboard');
                 }}
                 className="flex-1 py-1 text-[11px] font-medium bg-[#EAF7EF] text-[#08663A] rounded border border-[#138A4B]/20 text-center"
               >
