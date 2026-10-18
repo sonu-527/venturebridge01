@@ -1,234 +1,282 @@
-# VentureBridge
+# 🚀 VentureBridge
+### Connecting Talent, Startups & Capital
 
-> **Theme:** Entrepreneurship & Employment
-> *"Connecting Talent, Ideas, and Opportunities"*
+VentureBridge is a platform designed to connect **job seekers, startup founders, and investors** in one integrated ecosystem. It helps users discover employment opportunities, improve their skills, explore startups, connect with investors, and collaborate on new ventures.
 
-VentureBridge is a modern, responsive full-stack platform built for students, startup founders, job seekers, and early-stage investors. It solves real-world friction points in hiring, founding team assembly, transparent skill gap analysis, and mission-driven venture discovery.
-
----
-
-## 🌟 Key Features
-
-1. **Role-Based Onboarding & Dashboards**:
-   - **Entrepreneur**: Startup profiles, team recruiting, idea sharing with privacy controls, incoming investor inquiries.
-   - **Job Seeker**: Personalized skill match scores, applications tracker, interactive Skill Gap Analyzer.
-   - **Investor**: Startup discovery across Tech, Non-Tech, and Social Welfare ventures, confidential investor briefs, expression of interest memos.
-2. **Deterministic Skill-Based Job Matching**:
-   - Transparent formula: $\text{Match \%} = (\text{Matched Skills} / \text{Total Required Skills}) \times 100$.
-   - Itemized breakdown of matched skills, missing skills, and clear disclaimers that match measures skill overlap only.
-3. **Interactive Skill Gap Analyzer**:
-   - Compare current competencies against industry benchmarks (Frontend Developer, Backend Developer, Full Stack, Data Analyst, UI/UX Designer, Product Manager, Mobile Developer).
-   - Generates prioritized learning pathways.
-4. **Startup Idea Sharing & Rule-Based Analysis**:
-   - Choose between **PUBLIC** visibility or **INVESTOR_ONLY** visibility (strictly enforced on the backend).
-   - Instant structured checklist evaluating problem clarity, beachhead audience, proposed solution, competencies, and risk headwinds.
-5. **Dedicated Social Welfare Startup Discovery**:
-   - Filter specifically for mission-driven, circular economy, and community welfare initiatives.
-6. **Mentors Directory & Guidance Requests**:
-   - View verified industry leaders and submit formal requests for strategic guidance.
-   - *Strict Compliance*: Zero mentor feedback forms, tables, or endpoints.
-7. **Trust & Fraud Prevention**:
-   - Verified, Review Pending, and Unverified badges.
-   - Reporting console for jobs, profiles, or startups with status workflow (`Pending Review`, `Under Review`, `Resolved`).
-8. **Networking & Direct Messaging**:
-   - Connection requests with persistent in-database chat between accepted peers.
+Our vision is to bridge the gap between talent, entrepreneurship, and capital through a unified, interactive platform.
 
 ---
 
-## 🎨 Design System & Palette
+## 🏆 HackShift 2026 — IIIT Delhi
 
-- **Primary Green:** `#138A4B` (Brand primary, CTAs, highlight badges)
-- **Dark Green:** `#08663A` (Hover states, section badges)
-- **Light Green:** `#EAF7EF` (Pill backgrounds, score cards)
-- **Background:** `#F8FAF8` (Clean, spacious app canvas)
-- **White:** `#FFFFFF` (Surface cards, modals, navigation)
-- **Primary Text:** `#17211B` (High-contrast typography)
-- **Secondary Text:** `#65736A` (Readable metadata and captions)
-- **Borders:** `#E3EAE5` (Crisp, subtle dividers and card frames)
+**Hackathon:** HackShift 2026  
+**Institution:** Indraprastha Institute of Information Technology Delhi (IIIT Delhi)  
+**Team Name:** NEXUSFORGE  
+**Project:** VentureBridge
+
+VentureBridge was developed by Team NEXUSFORGE as a hackathon project focused on employment discovery, startup growth, skill development, and investor-founder collaboration.
+
+### 👥 Team NEXUSFORGE
+
+| Team Member | Responsibility |
+|---|---|
+| **Nitin Kumar** | Team Leader |
+| **Keshav Choudhary** | Frontend Development |
+| **Palak Sharma** | AI & Ranking |
+| **Sonu Kumar Mandal** | Backend & Data |
+| **Surabhi Pathak** | UI/UX & Testing |
 
 ---
 
-## 📁 Project Structure
+## ✨ Key Features
 
-```
-EntEmp/
-├── backend/
-│   ├── main.py                  # FastAPI application with all REST endpoints
-│   ├── database.py              # SQLite schema, connection pool & row factory
-│   ├── auth.py                  # Password hashing (PBKDF2), JWT & role auth
-│   ├── seed_data.py             # Realistic fictional demo data seeder
-│   ├── test_integration.py      # Automated 9-suite integration test script
-│   └── venturebridge.db         # SQLite persistent database
+### 👨‍💻 1. Job Seeker Platform
+- Discover job opportunities using search and filters.
+- View job-specific skill-match percentages.
+- Identify matched and missing skills.
+- Save jobs and track applications.
+- Edit profile information, education, and skills.
+- Use the Skill Gap Analyzer to assess career readiness.
+- Access relevant YouTube learning resources through Think & Grow.
+- Improve skills with targeted learning recommendations.
+
+### 🚀 2. Startup Founder Dashboard
+- Create and manage startup profiles.
+- Share startup ideas and explore structured, rule-based analysis.
+- Discover potential team members and investors.
+- Manage investor inquiries and connection requests.
+- Edit startup details and business information.
+- Enter monthly sales and revenue data where supported.
+- Optionally provide unit economics.
+- Track fundraising and business progress where implemented.
+
+### 💼 3. Investor Discovery
+- Discover startups across categories and industries.
+- Explore startup details and available business metrics.
+- Save interesting startups.
+- Express investment interest.
+- View startup ratings and experience comments according to permissions.
+- Coordinate meetings with founders.
+- Track investment-related discussions and milestones where supported.
+
+### 🌱 4. Think & Grow — Skill Development
+- Analyze missing skills for target roles.
+- View matched skills and skill gaps.
+- Access relevant YouTube learning links.
+- Explore learning roadmaps and practice suggestions.
+- Improve job readiness through targeted learning.
+
+### ⭐ 5. Ratings & Experience
+- Five-star rating system where enabled.
+- Startup experience comments subject to eligibility and permissions.
+- Role-based access controls for rating and review actions.
+- Protection against unauthorized rating and review operations.
+
+### 📊 6. Startup Analytics
+- Monthly sales/revenue graph based on saved data.
+- Optional unit economics breakdown.
+- Editable business information.
+- Financial details displayed according to access permissions.
+
+### 🤝 7. Meetings & Collaboration
+- Meeting requests between authorized participants.
+- Proposed meeting dates and times.
+- Approval and rejection workflows.
+- Google Meet links when supplied or supported by the configured integration.
+- Founder-investor collaboration and negotiation workflows where implemented.
+
+### 💰 8. Fundraising & Progress Tracking
+- Funding target and fundraising progress where supported.
+- Investor interest and negotiation status.
+- Investment milestone tracking.
+- Founder progress updates for investors where implemented.
+
+### 👥 9. People & Mentorship
+- Discover potential collaborators.
+- Send connection requests.
+- Communicate through available messaging features.
+- Discover mentors and request guidance.
+
+### 🌐 10. Hindi & English Interface
+- English and Hindi interface support.
+- Consistent navigation across supported languages.
+
+### 🎨 11. Modern User Experience
+- Responsive dashboards and reusable components.
+- Blue-and-yellow visual identity.
+- Interactive forms and navigation.
+- Loading, validation, and feedback states.
+
+> Feature availability may depend on the current implementation, configuration, and external integrations. Do not interpret planned or partially implemented features as production-ready.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| Styling | Tailwind CSS and project styles |
+| Backend | Python, FastAPI |
+| API Communication | REST APIs |
+| Authentication | Existing authentication and authorization system |
+| Data Visualization | Existing charting components/libraries |
+| Version Control | Git and GitHub |
+
+---
+
+## 🏗️ Project Structure
+
+```text
+VentureBridge/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.tsx               # Responsive nav with instant demo switcher
-│   │   │   ├── Footer.tsx               # Footer with policy & trust modals
-│   │   │   ├── TrustBadge.tsx           # Verified / Pending / Unverified pills
-│   │   │   ├── ReportModal.tsx          # Trust & fraud reporting modal
-│   │   │   ├── GuidanceRequestModal.tsx # Mentor guidance request modal
-│   │   │   ├── IdeaAnalysisModal.tsx    # Rule-based checklist modal
-│   │   │   └── MessagingDrawer.tsx      # Persistent chat between peers
-│   │   ├── context/
-│   │   │   └── AuthContext.tsx          # User state, JWT storage & quick login
 │   │   ├── pages/
-│   │   │   ├── HomePage.tsx             # Responsive landing page
-│   │   │   ├── AuthPage.tsx             # 3 selectable role cards & forms
-│   │   │   ├── EntrepreneurDashboard.tsx# Startups, ideas, investor inquiries
-│   │   │   ├── JobSeekerDashboard.tsx   # Skill match, gap analyzer, applications
-│   │   │   ├── InvestorDashboard.tsx    # Discover, saved, investor-only briefs
-│   │   │   ├── StartupsPage.tsx         # Directory with Social Welfare filter
-│   │   │   ├── OpportunitiesPage.tsx    # Jobs, internships, freelance board
-│   │   │   ├── FindPeoplePage.tsx       # Co-founder & candidate discovery
-│   │   │   ├── MentorsPage.tsx          # Mentor directory (guidance only)
-│   │   │   └── AdminReportsPage.tsx     # Trust & fraud review console
 │   │   ├── services/
-│   │   │   └── api.ts                   # Centralized API fetch service
-│   │   ├── types.ts                     # TypeScript data interfaces
-│   │   ├── App.tsx                      # App root router
-│   │   └── index.css                    # Tailwind CSS v4 design tokens
+│   │   └── ...
+│   ├── public/
 │   ├── package.json
-│   └── vite.config.ts                   # Tailwind plugin and API proxy
-└── README.md
+│   └── ...
+├── backend/
+│   ├── main.py
+│   ├── auth.py
+│   └── ...
+├── README.md
+└── .gitignore
 ```
 
----
-
-## 🚀 Startup Instructions
-
-### 1. Backend Startup
-
-1. Open a terminal in the `backend/` directory:
-   ```bash
-   cd backend
-   ```
-2. (Optional) Run the database seed script to populate demo data:
-   ```bash
-   python seed_data.py
-   ```
-3. Launch the FastAPI server using Uvicorn:
-   ```bash
-   python -m uvicorn main:app --host 127.0.0.1 --port 8000
-   ```
-   *The backend will be live at `http://127.0.0.1:8000`.*  
-   *Interactive API documentation is available at `http://127.0.0.1:8000/docs`.*
-
-### 2. Frontend Startup
-
-1. Open a second terminal in the `frontend/` directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies (if not already installed):
-   ```bash
-   npm install
-   ```
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-   *The frontend will run on `http://localhost:5173` (or `http://localhost:5174`).*
+*Illustrative structure. The actual repository may contain additional files and folders.*
 
 ---
 
-## 👥 Demo Accounts (Password for all: `password123`)
+## ⚙️ Getting Started
 
-| Persona | Role | Email | Highlights |
-| :--- | :--- | :--- | :--- |
-| **Sarah Chen** | Entrepreneur | `founder@ecotrack.io` | Founder of EcoTrack Solutions (Social Welfare Startup). Managing jobs, investor inquiries, and shared ideas. |
-| **Alex Rivera** | Job Seeker | `alex.dev@gmail.com` | Junior Full Stack Dev (React, Python, Tailwind). High skill match on EcoTrack and HealthPulse openings. |
-| **Marcus Vance** | Investor | `marcus.vc@apexventures.com` | Partner at Apex Seed Capital. Has access to confidential `INVESTOR_ONLY` startup briefs. |
-| **Priya Patel** | Entrepreneur | `priya@healthpulse.ai` | MedTech engineer behind HealthPulse Diagnostics. |
-| **Clara Sterling**| Investor | `clara.angel@horizon.com` | Angel investor focused on social impact and student ventures. |
+### Prerequisites
+- [Node.js](https://nodejs.org/)
+- [Python](https://www.python.org/)
+- Git
 
-> **Pro Tip:** In the top navigation bar, use the **"Demo Personas"** dropdown button to instantly switch between Sarah (Founder), Alex (Developer), and Marcus (Investor) without retyping credentials.
+### 1. Clone the repository
 
----
+Replace the URL below with your actual GitHub repository URL.
 
-## ☁️ Production Deployment Guide
+```bash
+git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+cd YOUR-REPOSITORY
+```
 
-VentureBridge is pre-configured for continuous deployment with **Render** (FastAPI backend) and **Vercel** (Vite frontend).
+### 2. Set up the backend
 
-### 1. Backend Deployment on Render
-
-1. **Sign in to Render**: Navigate to [dashboard.render.com](https://dashboard.render.com) and click **New + > Web Service**.
-2. **Connect Repository**: Select `sonu-527/venturebridge01` (Branch: `main`).
-3. **Configure Service Settings**:
-   - **Name**: `venturebridge-api` (or your choice)
-   - **Region**: Closest to your users (e.g., Oregon, Frankfurt)
-   - **Root Directory**: `backend`
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. **Configure Environment Variables**:
-   In **Environment Variables**, add:
-   | Variable | Value | Notes |
-   | :--- | :--- | :--- |
-   | `JWT_SECRET` | *(Generate a 32+ character random string)* | Secret for signing JWT authentication tokens |
-   | `ALLOWED_ORIGINS` | `https://venturebridge01.vercel.app` | Comma-separated list of allowed frontend origins |
-   | `AUTO_SEED` | `true` | Automatically seeds demo personas & startups if DB is empty |
-   | `DATABASE_URL` | *(Optional, see Database Persistence below)* | Connection string for Render PostgreSQL |
-5. **Health Check Path**:
-   Set Health Check Path to: `/health` (or `/api/health`).
-6. **Deploy**: Click **Create Web Service**. Once deployed, copy your Render service URL (e.g., `https://venturebridge-api.onrender.com`).
-
-#### 🗄️ Database Persistence on Render
-- **Default (SQLite)**: By default, the application runs on SQLite (`venturebridge.db`). Note that Render Free web services have ephemeral storage, meaning changes are reset when the service restarts.
-- **Production Persistence (PostgreSQL)**:
-  1. In Render, click **New + > PostgreSQL**.
-  2. Set database name (e.g., `venturebridge_db`).
-  3. Copy the **Internal Database URL** (if backend is on Render) or **External Database URL**.
-  4. Paste it as `DATABASE_URL` in your Web Service environment variables.
-  5. The backend automatically detects PostgreSQL, sets up the full schema, and seeds demo personas on first launch!
-
----
-
-### 2. Frontend Deployment on Vercel
-
-The frontend is already linked to Vercel at `https://venturebridge01.vercel.app`.
-
-To ensure the frontend communicates with your Render backend (fixing the demo login HTTP 404):
-
-1. **Open Vercel Project**: Go to [vercel.com](https://vercel.com) and open your `venturebridge01` project.
-2. **Project Settings**:
-   - **Root Directory**: `frontend`
-   - **Framework Preset**: `Vite`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-3. **Environment Variables**:
-   Under **Settings > Environment Variables**, add:
-   - **Key**: `VITE_API_BASE_URL`
-   - **Value**: `https://<your-render-backend-name>.onrender.com` (replace with your actual Render URL, without trailing slash)
-   - Apply to: **Production**, **Preview**, and **Development**
-4. **Redeploy**: Go to **Deployments > ... > Redeploy** to bake the new `VITE_API_BASE_URL` into the production build.
-
-> **Why Demo Login Returned 404 Previously:**
-> The frontend was previously requesting `/api/auth/login` on the Vercel domain (`https://venturebridge01.vercel.app/api/auth/login`), where no backend proxy existed. Setting `VITE_API_BASE_URL` directs all authentication and API calls to your live Render backend, while the new `frontend/vercel.json` SPA rewrite rule prevents client-side routing 404s on page refresh.
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated integration test suite against the local or remote backend:
 ```bash
 cd backend
-python test_integration.py
+python -m venv .venv
 ```
-Expected output:
+
+Activate the virtual environment.
+
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
 ```
-==========================================
-VENTUREBRIDGE COMPREHENSIVE INTEGRATION TEST
-==========================================
 
-0. Testing Health Checks and CORS Configuration...
-  [PASS] Root endpoint '/' returned online status
-  [PASS] Health check '/health' returned healthy status
-  [PASS] Proxy health check '/api/health' returned healthy status
-  [PASS] CORS preflight for 'https://venturebridge01.vercel.app' verified
+Install the backend dependencies using the dependency file included in the repository. If `requirements.txt` exists:
 
-...
-
-==========================================
-ALL 9 INTEGRATION TEST SUITES PASSED (100% SUCCESS)!
-==========================================
+```bash
+pip install -r requirements.txt
 ```
+
+Configure the required environment variables using the project's environment example. Never commit secrets, passwords, or API keys.
+
+Start the FastAPI server:
+
+```bash
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+API documentation, when enabled, is generally available at:
+
+- `http://127.0.0.1:8000/docs`
+
+Use the health-check endpoint configured in the actual backend.
+
+### 3. Set up the frontend
+
+Open a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local URL displayed by Vite, commonly:
+
+`http://localhost:5173`
+
+If Vite selects another port, use the URL printed in the terminal.
+
+### 4. Configure frontend-backend communication
+
+Verify that the frontend's API configuration and Vite proxy point to the correct backend.
+
+Use the existing configuration and environment variable names. Do not expose secrets in frontend code or commit private `.env` files.
+
+---
+
+## 🔐 Security
+
+- Keep API keys and credentials out of source control.
+- Enforce authorization on the backend.
+- Protect investor-only startup information.
+- Restrict financial records and meeting details to authorized users.
+- Validate user input on both frontend and backend.
+- Do not treat proposed investments as confirmed investments.
+- Do not claim government verification unless it is genuinely integrated.
+
+---
+
+## 🧪 Testing
+
+Run the frontend production build:
+
+```bash
+cd frontend
+npm run build
+```
+
+Run backend tests using the commands and framework configured in the repository. For a pytest-based project:
+
+```bash
+python -m pytest
+```
+
+Verify authentication, role permissions, startup workflows, job applications, skill matching, financial data, and meeting approval workflows against the current implementation.
+
+---
+
+## 🚀 Future Scope
+
+Potential improvements include:
+- Smarter talent-to-startup matching.
+- Expanded career learning pathways.
+- Improved startup discovery and transparent ranking.
+- More comprehensive bilingual support.
+- Authorized Google Calendar/Meet integration.
+- Richer startup analytics and milestone tracking.
+- Enhanced collaboration and notification features.
+
+---
+
+## 🎯 Our Mission
+
+VentureBridge aims to connect **talent, entrepreneurship, and capital** by helping people discover opportunities, founders build stronger ventures, and investors explore promising startups.
+
+**Discover opportunities. Build ventures. Grow together.**
+
+---
+
+## 📄 License
+
+No license has been specified yet. Add a `LICENSE` file before distributing the project under an open-source license.
