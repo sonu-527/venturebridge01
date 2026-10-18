@@ -1,6 +1,6 @@
 # VentureBridge
 
-> **Theme:** Entrepreneurship & Employment  
+> **Theme:** Entrepreneurship & Employment
 > *"Connecting Talent, Ideas, and Opportunities"*
 
 VentureBridge is a modern, responsive full-stack platform built for students, startup founders, job seekers, and early-stage investors. It solves real-world friction points in hiring, founding team assembly, transparent skill gap analysis, and mission-driven venture discovery.
