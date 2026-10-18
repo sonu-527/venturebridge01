@@ -69,7 +69,7 @@ def run_tests():
     check_cors_and_health()
 
     # 1. Login with demo accounts
-    print("\n1. Testing Login for 3 Roles...")
+    print("\n1. Testing Login for Roles...")
     # Entrepreneur
     status, res = request("POST", "/api/auth/login", {"email": "founder@ecotrack.io", "password": "password123"})
     assert status == 200, f"Entrepreneur login failed: {res}"
@@ -90,6 +90,13 @@ def run_tests():
     investor_token = res["access_token"]
     assert res["user"]["role"] == "investor"
     print("  [PASS] Investor login verified (Marcus Vance)")
+
+    # Platform Admin
+    status, res = request("POST", "/api/auth/login", {"email": "admin@venturebridge.org", "password": "password123"})
+    assert status == 200, f"Admin login failed: {res}"
+    admin_token = res["access_token"]
+    assert res["user"]["role"] == "admin"
+    print("  [PASS] Platform Admin login verified (System Administrator)")
 
     # 2. Registration with new user
     print("\n2. Testing Registration with Dynamic Role Profile...")
@@ -203,8 +210,8 @@ def run_tests():
     assert status in (404, 405, 422), f"Mentor feedback POST endpoint should NOT exist, got {status}!"
     print("  [PASS] Strict requirement verified: Zero mentor feedback endpoints exist")
 
-    # 8. Trust & Fraud Prevention Report
-    print("\n8. Testing Trust & Fraud Prevention Reporting...")
+    # 8. Trust & Fraud Prevention Report & Admin Gating
+    print("\n8. Testing Trust & Fraud Prevention Reporting & Admin Gating...")
     status, res = request("POST", "/api/reports", {
         "target_type": "Job",
         "target_id": 1,
@@ -216,10 +223,36 @@ def run_tests():
     assert res["status"] == "Pending Review"
     print(f"  [PASS] Report #{report_id} successfully submitted with status 'Pending Review'")
 
-    # Admin review status update
-    status, res = request("PUT", f"/api/admin/reports/{report_id}/status?status_val=Under%20Review", token=founder_token)
-    assert status == 200
-    print("  [PASS] Report audit status successfully updated to 'Under Review'")
+    # Unauthorized access checks: ordinary authenticated roles must receive HTTP 403 Forbidden
+    # 1. Job Seeker
+    status, _ = request("GET", "/api/admin/reports", token=jobseeker_token)
+    assert status == 403, f"Expected 403 for Job Seeker on GET admin reports, got {status}"
+    status, _ = request("PUT", f"/api/admin/reports/{report_id}/status?status_val=Under%20Review", token=jobseeker_token)
+    assert status == 403, f"Expected 403 for Job Seeker on PUT admin report status, got {status}"
+    print("  [PASS] Job Seeker correctly rejected with HTTP 403 Forbidden")
+
+    # 2. Entrepreneur
+    status, _ = request("GET", "/api/admin/reports", token=founder_token)
+    assert status == 403, f"Expected 403 for Entrepreneur on GET admin reports, got {status}"
+    status, _ = request("PUT", f"/api/admin/reports/{report_id}/status?status_val=Under%20Review", token=founder_token)
+    assert status == 403, f"Expected 403 for Entrepreneur on PUT admin report status, got {status}"
+    print("  [PASS] Entrepreneur correctly rejected with HTTP 403 Forbidden")
+
+    # 3. Investor
+    status, _ = request("GET", "/api/admin/reports", token=investor_token)
+    assert status == 403, f"Expected 403 for Investor on GET admin reports, got {status}"
+    status, _ = request("PUT", f"/api/admin/reports/{report_id}/status?status_val=Under%20Review", token=investor_token)
+    assert status == 403, f"Expected 403 for Investor on PUT admin report status, got {status}"
+    print("  [PASS] Investor correctly rejected with HTTP 403 Forbidden")
+
+    # 4. Authorized Admin
+    status, reports = request("GET", "/api/admin/reports", token=admin_token)
+    assert status == 200, f"Expected 200 for Admin on GET admin reports, got {status}"
+    assert isinstance(reports, list)
+    status, res = request("PUT", f"/api/admin/reports/{report_id}/status?status_val=Under%20Review", token=admin_token)
+    assert status == 200, f"Expected 200 for Admin on PUT admin report status, got {status}"
+    assert res.get("message") == "Report status updated to 'Under Review'."
+    print("  [PASS] Authorized Platform Admin successfully viewed reports and updated status")
 
     # 9. Connections & Persistent Direct Messaging
     print("\n9. Testing Connections & Direct Messaging...")

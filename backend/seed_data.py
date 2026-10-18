@@ -30,7 +30,10 @@ def seed_all():
             
             # Investors
             ("marcus.vc@apexventures.com", "password123", "investor", "Marcus Vance", "San Francisco, CA", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80", "Managing Partner at Apex Seed Capital. Investing in early-stage climate tech, health systems, and high-traction B2B SaaS.", 1),
-            ("clara.angel@horizon.com", "password123", "investor", "Clara Sterling", "New York, NY", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80", "Angel Investor & former CTO backing student founders and mission-driven social welfare enterprises.", 1)
+            ("clara.angel@horizon.com", "password123", "investor", "Clara Sterling", "New York, NY", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80", "Angel Investor & former CTO backing student founders and mission-driven social welfare enterprises.", 1),
+
+            # Platform Administrators (Trust & Safety Moderation)
+            ("admin@venturebridge.org", "password123", "admin", "System Administrator", "Platform Trust & Safety", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80", "VentureBridge Trust & Safety Platform Administrator.", 1)
         ]
 
         user_ids = {}
@@ -441,6 +444,21 @@ def seed_all():
                 "$40 / hr flexible",
                 "Verified",
                 1
+            ),
+            (
+                user_ids["founder@ecotrack.io"],
+                None,
+                "Senior Community Digital Literacy Advisor",
+                "SilverBridge Digital Inclusion",
+                "Guide older adults in community centers on smartphone safety, digital healthcare portals, and web basics. Flexible hours tailored for patient educators and community advisors.",
+                "Senior-friendly & Mentorship",
+                json.dumps(["Digital Literacy", "Communication", "Teaching", "Patient Mentoring"]),
+                "All Levels",
+                "Hybrid",
+                "Oakland, CA / Hybrid",
+                "$32 / hr (Flexible)",
+                "Verified",
+                1
             )
         ]
 
@@ -626,5 +644,130 @@ def seed_all():
 
         print("Database seeded successfully with rich demo data!")
 
+def ensure_admin():
+    """Guarantees a platform administrator exists for trust & fraud moderation."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE role = 'admin'")
+        if not cursor.fetchone():
+            now = datetime.now().isoformat()
+            cursor.execute("""
+            INSERT INTO users (email, password_hash, role, full_name, location, profile_image, bio, is_verified, created_at, updated_at)
+            VALUES (?, ?, 'admin', 'System Administrator', 'Platform Trust & Safety', ?, ?, 1, ?, ?)
+            """, (
+                "admin@venturebridge.org",
+                hash_password("password123"),
+                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+                "VentureBridge Trust & Safety Platform Administrator.",
+                now, now
+            ))
+            print("Default admin account ensured: admin@venturebridge.org")
+
+def ensure_extended_demo_data():
+    """Populates realistic business metrics, CGPA, sample reviews, and negotiation rooms for demo readiness."""
+    init_db()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # 1. Update job seeker CGPA and academic percentage if null
+        cursor.execute("UPDATE job_seeker_profiles SET cgpa = 8.8, academic_percentage = 88.0 WHERE user_id = (SELECT id FROM users WHERE email = 'alex.dev@gmail.com') AND (cgpa IS NULL OR cgpa = 0)")
+        cursor.execute("UPDATE job_seeker_profiles SET cgpa = 9.2, academic_percentage = 92.0 WHERE user_id = (SELECT id FROM users WHERE email = 'emma.design@gmail.com') AND (cgpa IS NULL OR cgpa = 0)")
+        cursor.execute("UPDATE job_seeker_profiles SET cgpa = 8.4, academic_percentage = 84.0 WHERE user_id = (SELECT id FROM users WHERE email = 'liam.data@gmail.com') AND (cgpa IS NULL OR cgpa = 0)")
+        
+        # 2. Update startups with sales and unit economics
+        ecotrack_sales = json.dumps([
+            {"month": "May 2026", "revenue": 140000, "profit": 35000},
+            {"month": "Jun 2026", "revenue": 185000, "profit": 52000},
+            {"month": "Jul 2026", "revenue": 240000, "profit": 74000},
+            {"month": "Aug 2026", "revenue": 310000, "profit": 98000},
+            {"month": "Sep 2026", "revenue": 420000, "profit": 135000},
+            {"month": "Oct 2026", "revenue": 560000, "profit": 190000}
+        ])
+        ecotrack_unit_econ = json.dumps({
+            "cac": 4200, "cogs": 3100, "logistics": 1500, "gross_margin": 62, "net_margin": 34, "average_order_value": 12500
+        })
+        cursor.execute("""
+            UPDATE startups
+            SET monthly_sales_json = CASE WHEN monthly_sales_json IS NULL OR monthly_sales_json = '' THEN ? ELSE monthly_sales_json END,
+                unit_economics_json = CASE WHEN unit_economics_json IS NULL OR unit_economics_json = '' THEN ? ELSE unit_economics_json END,
+                funding_raised = CASE WHEN funding_raised IS NULL OR funding_raised = 0 THEN 750000 ELSE funding_raised END,
+                funding_currency = CASE WHEN funding_currency IS NULL THEN 'INR' ELSE funding_currency END
+            WHERE name LIKE '%EcoTrack%'
+        """, (ecotrack_sales, ecotrack_unit_econ))
+
+        healthpulse_sales = json.dumps([
+            {"month": "May 2026", "revenue": 210000, "profit": 60000},
+            {"month": "Jun 2026", "revenue": 290000, "profit": 85000},
+            {"month": "Jul 2026", "revenue": 380000, "profit": 115000},
+            {"month": "Aug 2026", "revenue": 490000, "profit": 160000},
+            {"month": "Sep 2026", "revenue": 620000, "profit": 210000},
+            {"month": "Oct 2026", "revenue": 810000, "profit": 295000}
+        ])
+        healthpulse_unit_econ = json.dumps({
+            "cac": 6800, "cogs": 4200, "logistics": 1800, "gross_margin": 68, "net_margin": 36, "average_order_value": 22000
+        })
+        cursor.execute("""
+            UPDATE startups
+            SET monthly_sales_json = CASE WHEN monthly_sales_json IS NULL OR monthly_sales_json = '' THEN ? ELSE monthly_sales_json END,
+                unit_economics_json = CASE WHEN unit_economics_json IS NULL OR unit_economics_json = '' THEN ? ELSE unit_economics_json END,
+                funding_raised = CASE WHEN funding_raised IS NULL OR funding_raised = 0 THEN 1200000 ELSE funding_raised END,
+                funding_currency = CASE WHEN funding_currency IS NULL THEN 'INR' ELSE funding_currency END
+            WHERE name LIKE '%HealthPulse%'
+        """, (healthpulse_sales, healthpulse_unit_econ))
+
+        craftroot_sales = json.dumps([
+            {"month": "May 2026", "revenue": 95000, "profit": 22000},
+            {"month": "Jun 2026", "revenue": 130000, "profit": 31000},
+            {"month": "Jul 2026", "revenue": 175000, "profit": 44000},
+            {"month": "Aug 2026", "revenue": 220000, "profit": 58000},
+            {"month": "Sep 2026", "revenue": 280000, "profit": 76000},
+            {"month": "Oct 2026", "revenue": 360000, "profit": 105000}
+        ])
+        craftroot_unit_econ = json.dumps({
+            "cac": 2400, "cogs": 2100, "logistics": 1200, "gross_margin": 55, "net_margin": 29, "average_order_value": 6500
+        })
+        cursor.execute("""
+            UPDATE startups
+            SET monthly_sales_json = CASE WHEN monthly_sales_json IS NULL OR monthly_sales_json = '' THEN ? ELSE monthly_sales_json END,
+                unit_economics_json = CASE WHEN unit_economics_json IS NULL OR unit_economics_json = '' THEN ? ELSE unit_economics_json END,
+                funding_raised = CASE WHEN funding_raised IS NULL OR funding_raised = 0 THEN 350000 ELSE funding_raised END,
+                funding_currency = CASE WHEN funding_currency IS NULL THEN 'INR' ELSE funding_currency END
+            WHERE name LIKE '%CraftRoot%'
+        """, (craftroot_sales, craftroot_unit_econ))
+
+        # 3. Add sample ratings and comments if none exist
+        cursor.execute("SELECT COUNT(*) as cnt FROM ratings")
+        if cursor.fetchone()["cnt"] == 0:
+            now = datetime.now().isoformat()
+            cursor.execute("SELECT id, email FROM users")
+            users = {r["email"]: r["id"] for r in cursor.fetchall()}
+            if "marcus.vc@apexventures.com" in users and "founder@ecotrack.io" in users:
+                cursor.execute("""
+                    INSERT INTO ratings (rater_id, target_type, target_id, rating, review_text, created_at, updated_at)
+                    VALUES (?, 'founder', ?, 4.8, 'Exceptional execution speed, clear market positioning, and transparent unit economics.', ?, ?)
+                """, (users["marcus.vc@apexventures.com"], users["founder@ecotrack.io"], now, now))
+                cursor.execute("""
+                    INSERT INTO ratings (rater_id, target_type, target_id, rating, review_text, created_at, updated_at)
+                    VALUES (?, 'investor', ?, 4.9, 'Marcus provides high-impact network introductions, fast turnaround times, and supportive governance guidance.', ?, ?)
+                """, (users["founder@ecotrack.io"], users["marcus.vc@apexventures.com"], now, now))
+
+        # 4. Add sample startup comments
+        cursor.execute("SELECT COUNT(*) as cnt FROM startup_comments")
+        if cursor.fetchone()["cnt"] == 0:
+            now = datetime.now().isoformat()
+            cursor.execute("SELECT id FROM startups WHERE name LIKE '%EcoTrack%' LIMIT 1")
+            st = cursor.fetchone()
+            cursor.execute("SELECT id FROM users WHERE email = 'alex.dev@gmail.com'")
+            u = cursor.fetchone()
+            if st and u:
+                cursor.execute("""
+                    INSERT INTO startup_comments (startup_id, user_id, comment_text, pros, cons, role_title, employment_status, is_verified_employee, created_at, updated_at)
+                    VALUES (?, ?, 'Working on the geospatial client portal was one of the most rewarding engineering experiences. Very collaborative culture.', 'Collaborative technical team, mission-driven leadership, modern React stack.', 'Early-stage pivots happen rapidly, requires high autonomy.', 'Full Stack Engineering Intern', 'Verified Employment / Candidate', 1, ?, ?)
+                """, (st["id"], u["id"], now, now))
+        
+        print("Extended business metrics, CGPA, and demo ratings verified successfully!")
+
 if __name__ == "__main__":
     seed_all()
+    ensure_admin()
+    ensure_extended_demo_data()

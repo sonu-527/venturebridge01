@@ -616,3 +616,308 @@ def init_db():
             FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE
         );
         """)
+
+        # 17. Founder and Investor Ratings
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS ratings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            rater_id INTEGER NOT NULL,
+            target_type TEXT NOT NULL,
+            target_id INTEGER NOT NULL,
+            rating REAL NOT NULL,
+            review_text TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(rater_id, target_type, target_id)
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS ratings (
+            id SERIAL PRIMARY KEY,
+            rater_id INTEGER NOT NULL,
+            target_type TEXT NOT NULL,
+            target_id INTEGER NOT NULL,
+            rating REAL NOT NULL,
+            review_text TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(rater_id, target_type, target_id)
+        );
+        """)
+
+        # 18. Employee Experience Comments on Startups
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS startup_comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            startup_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            comment_text TEXT NOT NULL,
+            pros TEXT,
+            cons TEXT,
+            role_title TEXT,
+            employment_status TEXT DEFAULT 'Unverified Community Experience',
+            is_verified_employee INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS startup_comments (
+            id SERIAL PRIMARY KEY,
+            startup_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            comment_text TEXT NOT NULL,
+            pros TEXT,
+            cons TEXT,
+            role_title TEXT,
+            employment_status TEXT DEFAULT 'Unverified Community Experience',
+            is_verified_employee INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
+
+        # 19. Real-Time Interactive Negotiation Rooms
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS negotiation_rooms (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            startup_id INTEGER NOT NULL,
+            founder_id INTEGER NOT NULL,
+            investor_id INTEGER NOT NULL,
+            status TEXT DEFAULT 'Draft',
+            proposed_amount REAL DEFAULT 0.0,
+            currency TEXT DEFAULT 'INR',
+            proposed_valuation REAL DEFAULT 0.0,
+            proposed_equity REAL DEFAULT 0.0,
+            milestones TEXT,
+            google_meet_link TEXT,
+            scheduled_at TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (founder_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (investor_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS negotiation_rooms (
+            id SERIAL PRIMARY KEY,
+            startup_id INTEGER NOT NULL,
+            founder_id INTEGER NOT NULL,
+            investor_id INTEGER NOT NULL,
+            status TEXT DEFAULT 'Draft',
+            proposed_amount REAL DEFAULT 0.0,
+            currency TEXT DEFAULT 'INR',
+            proposed_valuation REAL DEFAULT 0.0,
+            proposed_equity REAL DEFAULT 0.0,
+            milestones TEXT,
+            google_meet_link TEXT,
+            scheduled_at TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (founder_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (investor_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
+
+        # 20. Negotiation Messages & Offer History
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS negotiation_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_id INTEGER NOT NULL,
+            sender_id INTEGER NOT NULL,
+            message_type TEXT DEFAULT 'text',
+            content TEXT NOT NULL,
+            proposed_amount REAL,
+            proposed_equity REAL,
+            proposed_valuation REAL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (room_id) REFERENCES negotiation_rooms(id) ON DELETE CASCADE,
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS negotiation_messages (
+            id SERIAL PRIMARY KEY,
+            room_id INTEGER NOT NULL,
+            sender_id INTEGER NOT NULL,
+            message_type TEXT DEFAULT 'text',
+            content TEXT NOT NULL,
+            proposed_amount REAL,
+            proposed_equity REAL,
+            proposed_valuation REAL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (room_id) REFERENCES negotiation_rooms(id) ON DELETE CASCADE,
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
+
+        # 21. Monthly Founder Progress Reports
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS monthly_progress_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            startup_id INTEGER NOT NULL,
+            founder_id INTEGER NOT NULL,
+            investor_id INTEGER NOT NULL,
+            reporting_month TEXT NOT NULL,
+            revenue REAL DEFAULT 0.0,
+            expenses REAL DEFAULT 0.0,
+            milestones_achieved TEXT,
+            challenges TEXT,
+            next_month_goals TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (founder_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (investor_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS monthly_progress_reports (
+            id SERIAL PRIMARY KEY,
+            startup_id INTEGER NOT NULL,
+            founder_id INTEGER NOT NULL,
+            investor_id INTEGER NOT NULL,
+            reporting_month TEXT NOT NULL,
+            revenue REAL DEFAULT 0.0,
+            expenses REAL DEFAULT 0.0,
+            milestones_achieved TEXT,
+            challenges TEXT,
+            next_month_goals TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (founder_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (investor_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
+
+        # 22. Group Discussion (GD) Meetings for Employers
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS group_meetings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            employer_id INTEGER NOT NULL,
+            opportunity_id INTEGER,
+            title TEXT NOT NULL,
+            agenda TEXT,
+            scheduled_at TEXT NOT NULL,
+            google_meet_url TEXT NOT NULL,
+            candidate_ids_json TEXT NOT NULL,
+            status TEXT DEFAULT 'Scheduled',
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (employer_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (opportunity_id) REFERENCES opportunities(id) ON DELETE SET NULL
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS group_meetings (
+            id SERIAL PRIMARY KEY,
+            employer_id INTEGER NOT NULL,
+            opportunity_id INTEGER,
+            title TEXT NOT NULL,
+            agenda TEXT,
+            scheduled_at TEXT NOT NULL,
+            google_meet_url TEXT NOT NULL,
+            candidate_ids_json TEXT NOT NULL,
+            status TEXT DEFAULT 'Scheduled',
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (employer_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (opportunity_id) REFERENCES opportunities(id) ON DELETE SET NULL
+        );
+        """)
+
+        # 23. Confirmed Investments (for idempotent fundraising accounting)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS confirmed_investments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            startup_id INTEGER NOT NULL,
+            investor_id INTEGER NOT NULL,
+            source_type TEXT NOT NULL,
+            source_id INTEGER NOT NULL,
+            amount REAL NOT NULL,
+            currency TEXT DEFAULT 'INR',
+            confirmed_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (investor_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(source_type, source_id)
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS confirmed_investments (
+            id SERIAL PRIMARY KEY,
+            startup_id INTEGER NOT NULL,
+            investor_id INTEGER NOT NULL,
+            source_type TEXT NOT NULL,
+            source_id INTEGER NOT NULL,
+            amount REAL NOT NULL,
+            currency TEXT DEFAULT 'INR',
+            confirmed_at TEXT NOT NULL,
+            FOREIGN KEY (startup_id) REFERENCES startups(id) ON DELETE CASCADE,
+            FOREIGN KEY (investor_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(source_type, source_id)
+        );
+        """)
+
+        # 24. Two-Party Google Meet Requests & Approval Workflow
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS meeting_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            requester_id INTEGER NOT NULL,
+            recipient_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            purpose TEXT,
+            meeting_date TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            scheduled_at TEXT NOT NULL,
+            duration_minutes INTEGER DEFAULT 30,
+            time_zone TEXT DEFAULT 'UTC',
+            agenda TEXT,
+            google_meet_url TEXT,
+            status TEXT DEFAULT 'Pending',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """ if not IS_POSTGRES else """
+        CREATE TABLE IF NOT EXISTS meeting_requests (
+            id SERIAL PRIMARY KEY,
+            requester_id INTEGER NOT NULL,
+            recipient_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            purpose TEXT,
+            meeting_date TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            scheduled_at TEXT NOT NULL,
+            duration_minutes INTEGER DEFAULT 30,
+            time_zone TEXT DEFAULT 'UTC',
+            agenda TEXT,
+            google_meet_url TEXT,
+            status TEXT DEFAULT 'Pending',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
+
+        # Safe Column Migrations (non-destructive)
+        migrations = [
+            ("startups", "monthly_sales_json", "TEXT"),
+            ("startups", "unit_economics_json", "TEXT"),
+            ("startups", "funding_raised", "REAL DEFAULT 0.0"),
+            ("startups", "funding_currency", "TEXT DEFAULT 'INR'"),
+            ("startups", "financials_visibility", "TEXT DEFAULT 'PUBLIC'"),
+            ("startup_ideas", "monthly_sales_json", "TEXT"),
+            ("startup_ideas", "unit_economics_json", "TEXT"),
+            ("job_seeker_profiles", "cgpa", "REAL"),
+            ("job_seeker_profiles", "academic_percentage", "REAL"),
+        ]
+
+        for table, col, col_type in migrations:
+            try:
+                cursor.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_type};")
+            except Exception:
+                pass  # Column already exists in database

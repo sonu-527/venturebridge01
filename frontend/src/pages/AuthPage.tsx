@@ -14,6 +14,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { UserRole } from '../types';
 
 interface AuthPageProps {
@@ -23,6 +24,7 @@ interface AuthPageProps {
 
 export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setCurrentPage }) => {
   const { login, register, quickLogin } = useAuth();
+  const { t } = useLanguage();
   const [isLogin, setIsLogin] = useState<boolean>(initialMode === 'login');
   const [selectedRole, setSelectedRole] = useState<UserRole>('entrepreneur');
   
@@ -111,9 +113,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
       payload.skills = parseCommaList(skillsInput);
       payload.experience_level = experienceLevel;
       payload.preferred_work_mode = preferredWorkMode;
-      payload.portfolio_url = portfolioUrl;
-      payload.github_url = githubUrl;
-      payload.career_interests = careerInterests;
+      payload.portfolio_url = portfolioUrl || undefined;
+      payload.github_url = githubUrl || undefined;
+      payload.career_interests = parseCommaList(careerInterests);
     } else if (selectedRole === 'investor') {
       payload.investor_type = investorType;
       payload.areas_of_interest = areasOfInterest;
@@ -125,7 +127,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
       const user = await register(payload);
       redirectToDashboard(user.role);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to register account.');
+      setErrorMessage(err.message || 'Registration failed.');
     } finally {
       setIsLoading(false);
     }
@@ -145,66 +147,33 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 sm:px-6">
-      {/* Tab Switcher & Header */}
-      <div className="text-center max-w-xl mx-auto mb-8 space-y-3">
-        <h1 className="text-3xl font-extrabold text-[#17211B] tracking-tight">
-          {isLogin ? 'Welcome Back to VentureBridge' : 'Join VentureBridge'}
+    <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 space-y-8">
+      {/* Header & Mode Switcher */}
+      <div className="text-center space-y-3">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          {isLogin ? t.signIn : t.createAccount}
         </h1>
-        <p className="text-sm text-[#65736A]">
+        <p className="text-xs sm:text-sm text-slate-500">
           {isLogin
-            ? 'Access your role-based dashboard and continue your collaborations.'
-            : 'Select your role to connect with co-founders, opportunities, or ventures.'}
+            ? 'Sign in to access your dashboard and continue collaborations.'
+            : 'Join VentureBridge to connect with co-founders, opportunities, and capital.'}
         </p>
 
-        {/* Quick Demo Access Box */}
-        <div className="p-3.5 rounded-2xl bg-[#EAF7EF] border border-[#138A4B]/20 text-left">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-[#08663A] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              Quick Demo Access (One-Click)
-            </span>
-            <span className="text-[10px] text-[#08663A]/80 font-medium">Instant testing</span>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('entrepreneur')}
-              className="py-1.5 px-2 bg-white text-[#17211B] rounded-xl text-xs font-semibold hover:border-[#138A4B] border border-[#E3EAE5] transition-all shadow-2xs text-center"
-            >
-              Sarah (Founder)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('job_seeker')}
-              className="py-1.5 px-2 bg-white text-[#17211B] rounded-xl text-xs font-semibold hover:border-[#138A4B] border border-[#E3EAE5] transition-all shadow-2xs text-center"
-            >
-              Alex (Developer)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('investor')}
-              className="py-1.5 px-2 bg-white text-[#17211B] rounded-xl text-xs font-semibold hover:border-[#138A4B] border border-[#E3EAE5] transition-all shadow-2xs text-center"
-            >
-              Marcus (Investor)
-            </button>
-          </div>
-        </div>
-
-        <div className="inline-flex rounded-xl p-1 bg-[#F8FAF8] border border-[#E3EAE5] mt-2">
+        {/* Mode Toggle */}
+        <div className="inline-flex rounded-xl p-1 bg-white border border-slate-200 shadow-2xs mt-2">
           <button
             type="button"
             onClick={() => {
               setIsLogin(false);
               setErrorMessage(null);
             }}
-            className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`px-5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               !isLogin
-                ? 'bg-white text-[#138A4B] shadow-xs'
-                : 'text-[#65736A] hover:text-[#17211B]'
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            Create Account
+            {t.createAccount}
           </button>
           <button
             type="button"
@@ -212,58 +181,92 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
               setIsLogin(true);
               setErrorMessage(null);
             }}
-            className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`px-5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               isLogin
-                ? 'bg-white text-[#138A4B] shadow-xs'
-                : 'text-[#65736A] hover:text-[#17211B]'
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            Log In
+            {t.signIn}
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Demo Access Bar */}
+      <div className="p-4 rounded-2xl bg-white border border-slate-200 text-left shadow-2xs space-y-2.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            Quick Demo Access (One-Click Personas)
+          </span>
+          <span className="text-[11px] text-slate-400">Instant evaluation</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('entrepreneur')}
+            className="py-2 px-2 bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-blue-700 rounded-xl text-xs font-medium border border-slate-200 hover:border-blue-300 transition-all text-center"
+          >
+            Sarah (Founder)
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('job_seeker')}
+            className="py-2 px-2 bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-blue-700 rounded-xl text-xs font-medium border border-slate-200 hover:border-blue-300 transition-all text-center"
+          >
+            Alex (Candidate)
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('investor')}
+            className="py-2 px-2 bg-slate-50 hover:bg-blue-50 text-slate-800 hover:text-blue-700 rounded-xl text-xs font-medium border border-slate-200 hover:border-blue-300 transition-all text-center"
+          >
+            Marcus (Investor)
           </button>
         </div>
       </div>
 
       {errorMessage && (
-        <div className="mb-6 max-w-lg mx-auto p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+        <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* LOGIN FORM */}
+      {/* LOGIN VIEW */}
       {isLogin ? (
-        <div className="max-w-md mx-auto bg-white rounded-3xl border border-[#E3EAE5] p-6 sm:p-8 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                Email Address
+              <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                {t.emailAddress}
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-[#65736A] absolute left-3.5 top-3" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="email"
                   required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="e.g. founder@ecotrack.io"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] placeholder-[#65736A]/50 focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                  placeholder="founder@ecotrack.io"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                Password
+              <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                {t.password}
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#65736A] absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="password"
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] placeholder-[#65736A]/50 focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
             </div>
@@ -271,118 +274,97 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl bg-[#138A4B] text-white font-semibold text-sm hover:bg-[#08663A] transition-colors shadow-xs disabled:opacity-50 mt-2"
+              className="w-full py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-xs sm:text-sm hover:bg-blue-700 active:scale-[0.99] transition-all shadow-xs disabled:opacity-50 mt-2"
             >
-              {isLoading ? 'Signing In...' : 'Sign In to Dashboard'}
+              {isLoading ? 'Signing In...' : t.signIn}
             </button>
           </form>
         </div>
       ) : (
-        /* REGISTRATION FLOW WITH 3 ROLE SELECTABLE CARDS */
-        <div className="bg-white rounded-3xl border border-[#E3EAE5] p-6 sm:p-10 shadow-sm space-y-8">
-          {/* 3 Main Role Selection Cards */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#17211B] mb-3">
+        /* REGISTRATION VIEW */
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+          {/* Role Selection */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-900">
               Step 1: Choose Your Primary Role
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Role 1: Entrepreneur */}
-              <div
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                type="button"
                 onClick={() => setSelectedRole('entrepreneur')}
-                className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between ${
                   selectedRole === 'entrepreneur'
-                    ? 'border-[#138A4B] bg-[#EAF7EF]/40 shadow-xs'
-                    : 'border-[#E3EAE5] hover:border-gray-300 bg-white'
+                    ? 'border-blue-600 bg-blue-50/50 shadow-2xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#EAF7EF] text-[#08663A] flex items-center justify-center font-bold">
-                      <Rocket className="w-5 h-5 text-[#138A4B]" />
-                    </div>
-                    {selectedRole === 'entrepreneur' && (
-                      <CheckCircle2 className="w-5 h-5 text-[#138A4B]" />
-                    )}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Rocket className={`w-4 h-4 ${selectedRole === 'entrepreneur' ? 'text-blue-600' : 'text-slate-400'}`} />
+                    {selectedRole === 'entrepreneur' && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
                   </div>
-                  <h3 className="font-bold text-base text-[#17211B]">Entrepreneur</h3>
-                  <p className="text-xs text-[#65736A] mt-1 leading-relaxed">
-                    Build your startup, find co-founders, post openings, and hire talented people.
+                  <div className="font-bold text-sm text-slate-900 pt-1">Founder</div>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    Build ventures & assemble your team.
                   </p>
                 </div>
-                <div className="mt-4 text-[11px] font-semibold text-[#138A4B]">
-                  Post Startups & Ideas →
-                </div>
-              </div>
+              </button>
 
-              {/* Role 2: Job Seeker */}
-              <div
+              <button
+                type="button"
                 onClick={() => setSelectedRole('job_seeker')}
-                className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between ${
                   selectedRole === 'job_seeker'
-                    ? 'border-[#138A4B] bg-[#EAF7EF]/40 shadow-xs'
-                    : 'border-[#E3EAE5] hover:border-gray-300 bg-white'
+                    ? 'border-blue-600 bg-blue-50/50 shadow-2xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#EAF7EF] text-[#08663A] flex items-center justify-center font-bold">
-                      <Briefcase className="w-5 h-5 text-[#138A4B]" />
-                    </div>
-                    {selectedRole === 'job_seeker' && (
-                      <CheckCircle2 className="w-5 h-5 text-[#138A4B]" />
-                    )}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Briefcase className={`w-4 h-4 ${selectedRole === 'job_seeker' ? 'text-blue-600' : 'text-slate-400'}`} />
+                    {selectedRole === 'job_seeker' && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
                   </div>
-                  <h3 className="font-bold text-base text-[#17211B]">Job Seeker</h3>
-                  <p className="text-xs text-[#65736A] mt-1 leading-relaxed">
-                    Discover jobs, internships, freelance projects matching your skills, and analyze skill gaps.
+                  <div className="font-bold text-sm text-slate-900 pt-1">Job Seeker</div>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    Find matched roles & gap analysis.
                   </p>
                 </div>
-                <div className="mt-4 text-[11px] font-semibold text-[#138A4B]">
-                  Transparent Skill Match →
-                </div>
-              </div>
+              </button>
 
-              {/* Role 3: Investor */}
-              <div
+              <button
+                type="button"
                 onClick={() => setSelectedRole('investor')}
-                className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between ${
                   selectedRole === 'investor'
-                    ? 'border-[#138A4B] bg-[#EAF7EF]/40 shadow-xs'
-                    : 'border-[#E3EAE5] hover:border-gray-300 bg-white'
+                    ? 'border-blue-600 bg-blue-50/50 shadow-2xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#EAF7EF] text-[#08663A] flex items-center justify-center font-bold">
-                      <TrendingUp className="w-5 h-5 text-[#138A4B]" />
-                    </div>
-                    {selectedRole === 'investor' && (
-                      <CheckCircle2 className="w-5 h-5 text-[#138A4B]" />
-                    )}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <TrendingUp className={`w-4 h-4 ${selectedRole === 'investor' ? 'text-blue-600' : 'text-slate-400'}`} />
+                    {selectedRole === 'investor' && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
                   </div>
-                  <h3 className="font-bold text-base text-[#17211B]">Investor</h3>
-                  <p className="text-xs text-[#65736A] mt-1 leading-relaxed">
-                    Discover vetted startups, view confidential investor-only ideas, and express interest to founders.
+                  <div className="font-bold text-sm text-slate-900 pt-1">Investor</div>
+                  <p className="text-[11px] text-slate-500 leading-snug">
+                    Access private startup briefs.
                   </p>
                 </div>
-                <div className="mt-4 text-[11px] font-semibold text-[#138A4B]">
-                  Private Briefings Access →
-                </div>
-              </div>
+              </button>
             </div>
           </div>
 
           {/* Form Fields */}
-          <form onSubmit={handleRegisterSubmit} className="space-y-6 pt-4 border-t border-[#E3EAE5]">
-            <div className="text-xs font-bold uppercase tracking-wider text-[#17211B]">
-              Step 2: Profile & Role Specifics
+          <form onSubmit={handleRegisterSubmit} className="space-y-5 pt-4 border-t border-slate-200">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-900">
+              Step 2: Profile Details
             </div>
 
-            {/* Common Fields */}
+            {/* Base credentials */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                  Full Name *
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  {t.fullName} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -390,27 +372,27 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                   placeholder="e.g. Maya Chen"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                  Email Address *
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  {t.emailAddress} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="e.g. maya@example.com"
+                  placeholder="maya@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                  Password *
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  {t.password} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="password"
@@ -418,78 +400,78 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                  Location (City, State / Country)
+                <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                  {t.location}
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. San Francisco, CA"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                Bio / Mission Statement
+              <label className="block text-xs font-semibold text-slate-900 mb-1.5">
+                {t.bio}
               </label>
               <textarea
                 rows={2}
-                placeholder="Briefly describe what you are building, your career focus, or what drives your investment thesis..."
+                placeholder="Brief summary of your focus and goals..."
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B] focus:ring-1 focus:ring-[#138A4B]"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 resize-none"
               />
             </div>
 
-            {/* Entrepreneur Fields */}
+            {/* Entrepreneur role fields */}
             {selectedRole === 'entrepreneur' && (
-              <div className="p-5 rounded-2xl bg-[#F8FAF8] border border-[#E3EAE5] space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#08663A]">
-                  Entrepreneur Details
-                </h4>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                  Founder Details
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Startup Name (Optional initially)
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.startupName}
                     </label>
                     <input
                       type="text"
                       placeholder="e.g. EcoTrack Solutions"
                       value={startupName}
                       onChange={(e) => setStartupName(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Industry
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.industry}
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. CleanTech, HealthTech, Fair Trade"
+                      placeholder="e.g. CleanTech, HealthTech"
                       value={industry}
                       onChange={(e) => setIndustry(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Startup Stage
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.stage}
                     </label>
                     <select
                       value={startupStage}
                       onChange={(e) => setStartupStage(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     >
                       <option value="Idea Phase">Idea Phase</option>
                       <option value="MVP / Prototype">MVP / Prototype</option>
@@ -499,62 +481,62 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Skills Needed in Team (comma separated)
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.skillsNeeded}
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. React, Python, UI/UX, Growth"
+                      placeholder="React, Python, UI/UX"
                       value={skillsNeededInput}
                       onChange={(e) => setSkillsNeededInput(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Job Seeker Fields */}
+            {/* Job Seeker role fields */}
             {selectedRole === 'job_seeker' && (
-              <div className="p-5 rounded-2xl bg-[#F8FAF8] border border-[#E3EAE5] space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#08663A]">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-blue-700">
                   Candidate & Skill Details
-                </h4>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Education & Degree
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.education}
                     </label>
                     <input
                       type="text"
                       placeholder="e.g. B.S. in Computer Science"
                       value={education}
                       onChange={(e) => setEducation(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Skills (comma separated)
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.skills}
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. React, JavaScript, Python, Tailwind"
+                      placeholder="React, TypeScript, Python"
                       value={skillsInput}
                       onChange={(e) => setSkillsInput(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Experience Level
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.experienceLevel}
                     </label>
                     <select
                       value={experienceLevel}
                       onChange={(e) => setExperienceLevel(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     >
                       <option value="Entry Level">Entry Level (Student / New Grad)</option>
                       <option value="Junior">Junior (1-2 years)</option>
@@ -564,23 +546,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
                       Preferred Work Mode
                     </label>
                     <select
                       value={preferredWorkMode}
                       onChange={(e) => setPreferredWorkMode(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     >
                       <option value="Remote">Remote</option>
                       <option value="Hybrid">Hybrid</option>
                       <option value="On-site">On-site</option>
-                      <option value="Any">Any Mode</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
                       Portfolio URL (Optional)
                     </label>
                     <input
@@ -588,12 +569,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                       placeholder="https://myportfolio.dev"
                       value={portfolioUrl}
                       onChange={(e) => setPortfolioUrl(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
                       GitHub URL (Optional)
                     </label>
                     <input
@@ -601,28 +582,28 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                       placeholder="https://github.com/username"
                       value={githubUrl}
                       onChange={(e) => setGithubUrl(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Investor Fields */}
+            {/* Investor role fields */}
             {selectedRole === 'investor' && (
-              <div className="p-5 rounded-2xl bg-[#F8FAF8] border border-[#E3EAE5] space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#08663A]">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-blue-700">
                   Investor Profile
-                </h4>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Investor Type
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.investorType}
                     </label>
                     <select
                       value={investorType}
                       onChange={(e) => setInvestorType(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     >
                       <option value="Angel Investor">Angel Investor</option>
                       <option value="Venture Capital">Venture Capital</option>
@@ -633,13 +614,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
-                      Investment Stage Preference
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
+                      {t.preferredStage}
                     </label>
                     <select
                       value={investmentStagePref}
                       onChange={(e) => setInvestmentStagePref(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     >
                       <option value="Pre-Seed">Pre-Seed</option>
                       <option value="Seed">Seed</option>
@@ -649,7 +630,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#65736A] mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-900 mb-1">
                       Preferred Industries & Focus
                     </label>
                     <input
@@ -657,7 +638,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
                       placeholder="e.g. Social Welfare, CleanTech, Healthcare, B2B SaaS"
                       value={preferredIndustries}
                       onChange={(e) => setPreferredIndustries(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-[#E3EAE5] bg-white text-sm text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
@@ -667,7 +648,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'signup', setC
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 rounded-xl bg-[#138A4B] text-white font-semibold text-sm hover:bg-[#08663A] transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold text-xs sm:text-sm hover:bg-blue-700 active:scale-[0.99] transition-all shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>{isLoading ? 'Creating Account...' : 'Complete Registration & Open Dashboard'}</span>

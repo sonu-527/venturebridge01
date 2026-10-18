@@ -17,9 +17,11 @@ import { Candidate } from '../types';
 import { api } from '../services/api';
 import { TrustBadge } from '../components/TrustBadge';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const FindPeoplePage: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -77,40 +79,37 @@ export const FindPeoplePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div className="max-w-2xl space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EAF7EF] text-[#08663A] border border-[#138A4B]/20">
-          <Users className="w-3.5 h-3.5" />
-          <span>Talent & Co-Founder Discovery</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <Users className="w-3.5 h-3.5 text-blue-600" />
+            <span>Co-founder & Talent Discovery</span>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            {t.searchCandidates} & Team
+          </h1>
+          <p className="text-xs text-slate-500 max-w-xl">
+            Candidate ranking based on declared skills and preferred collaboration modes.
+          </p>
         </div>
-        <h1 className="text-3xl font-extrabold text-[#17211B] tracking-tight">
-          Find Co-founders & Team Members
-        </h1>
-        <p className="text-xs sm:text-sm text-[#65736A] leading-relaxed">
-          Transparent candidate ranking based on declared competencies and collaboration modes. Each match displays a verified rationale.
-        </p>
-      </div>
 
-      {/* Matching Rationale Notice */}
-      <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-2xl flex items-start gap-3 text-xs text-amber-950">
-        <Sparkles className="w-4 h-4 shrink-0 text-amber-700 mt-0.5" />
-        <div>
-          <strong>Transparent Match Rationale:</strong> Candidates are ranked by verified skill overlap with your startup requirements.
-          A high match score highlights technical overlap only; founders and candidates should independently evaluate interpersonal and operational compatibility.
+        <div className="text-[11px] text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200 flex items-center gap-1.5 self-start md:self-auto font-medium">
+          <span>{candidates.length} profiles available</span>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="p-4 bg-white rounded-2xl border border-[#E3EAE5] shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-[#65736A] absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
             placeholder="Filter by skill (e.g. React, Python, Figma)..."
             value={targetSkill}
             onChange={(e) => setTargetSkill(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-[#E3EAE5] text-xs text-[#17211B] focus:outline-none focus:border-[#138A4B]"
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
           />
         </div>
 
@@ -118,9 +117,9 @@ export const FindPeoplePage: React.FC = () => {
           <select
             value={preferredMode}
             onChange={(e) => setPreferredMode(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-[#E3EAE5] bg-white text-xs text-[#17211B]"
+            className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-900 focus:outline-none focus:border-blue-600"
           >
-            <option value="All">All Work Modes</option>
+            <option value="All">{t.filterAllWorkModes}</option>
             <option value="Remote">Remote Only</option>
             <option value="Hybrid">Hybrid</option>
             <option value="On-site">On-site</option>
@@ -130,67 +129,70 @@ export const FindPeoplePage: React.FC = () => {
 
       {/* Candidate Cards Grid */}
       {isLoading ? (
-        <div className="text-center py-16 text-xs text-[#65736A]">
+        <div className="text-center py-16 text-xs text-slate-500">
           Loading candidate profiles...
         </div>
       ) : candidates.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-[#E3EAE5] p-8">
-          <Users className="w-12 h-12 text-[#65736A]/40 mx-auto mb-3" />
-          <h3 className="font-semibold text-sm text-[#17211B]">No matching talent found</h3>
-          <p className="text-xs text-[#65736A] mt-1">Try clearing your skill filter to see all candidates.</p>
+        <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 p-8">
+          <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+          <h3 className="font-semibold text-sm text-slate-900">No matching talent found</h3>
+          <p className="text-xs text-slate-500 mt-1">Try clearing your skill filter to see all candidates.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {candidates.map((cand) => (
             <div
               key={cand.id}
-              className="bg-white rounded-2xl border border-[#E3EAE5] p-6 shadow-xs hover:border-[#138A4B]/40 transition-all flex flex-col justify-between space-y-4"
+              className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:border-blue-400 transition-all flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={cand.profile_image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-                      alt={cand.full_name}
-                      className="w-11 h-11 rounded-full object-cover border border-[#E3EAE5]"
-                    />
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-bold text-xs">
+                      {cand.full_name?.slice(0, 2).toUpperCase()}
+                    </div>
                     <div>
-                      <h3 className="font-bold text-sm text-[#17211B]">{cand.full_name}</h3>
-                      <p className="text-xs text-[#65736A]">{cand.experience_level} · {cand.preferred_work_mode}</p>
+                      <h3 className="font-bold text-sm text-slate-900">{cand.full_name}</h3>
+                      <p className="text-xs text-slate-500">{cand.location || 'Location flexible'}</p>
                     </div>
                   </div>
                   <TrustBadge status={cand.is_verified ? 'Verified' : 'Unverified'} size="sm" />
                 </div>
 
-                {cand.bio && (
-                  <p className="text-xs text-[#65736A] leading-relaxed line-clamp-2">
-                    {cand.bio}
-                  </p>
-                )}
+                <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                  {cand.bio || 'Product builder focused on early-stage initiatives.'}
+                </p>
 
-                {/* Match Rationale Card */}
-                {cand.match_reason && (
-                  <div className="p-3 bg-[#EAF7EF]/70 rounded-xl border border-[#138A4B]/20 text-xs text-[#08663A] leading-relaxed">
-                    <strong>Match Rationale: </strong>
-                    <span>{cand.match_reason}</span>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-500">Education:</span>
+                    <span className="font-semibold text-slate-900">{cand.education || 'Computer Science'}</span>
                   </div>
-                )}
-
-                <div className="text-[11px] text-[#65736A] space-y-0.5">
-                  {cand.education && <div><strong className="text-[#17211B]">Education:</strong> {cand.education}</div>}
-                  {cand.location && <div><strong className="text-[#17211B]">Location:</strong> {cand.location}</div>}
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-500">Experience:</span>
+                    <span className="font-semibold text-slate-900">{cand.experience_level || 'Intermediate'}</span>
+                  </div>
+                  {cand.cgpa ? (
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500">Academic Score:</span>
+                      <span className="font-bold text-amber-600">CGPA {cand.cgpa}/10</span>
+                    </div>
+                  ) : null}
                 </div>
 
-                {/* Skills tags */}
                 <div className="space-y-1">
-                  <div className="text-[10px] font-semibold text-[#65736A] uppercase tracking-wider">
-                    Core Skills:
+                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                    Skills:
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {cand.skills?.map((sk, i) => (
                       <span
                         key={i}
-                        className="px-2 py-0.5 text-[10px] bg-[#F8FAF8] border border-[#E3EAE5] rounded text-[#17211B]"
+                        className={`px-2 py-0.5 text-[10px] rounded border ${
+                          targetSkill && sk.toLowerCase().includes(targetSkill.toLowerCase())
+                            ? 'bg-blue-100 text-blue-800 border-blue-300 font-bold'
+                            : 'bg-slate-50 border-slate-200 text-slate-700'
+                        }`}
                       >
                         {sk}
                       </span>
@@ -199,39 +201,24 @@ export const FindPeoplePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Footer with Portfolio/GitHub links and Connect Button */}
-              <div className="pt-3 border-t border-[#E3EAE5] flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  {cand.portfolio_url && (
-                    <a
-                      href={cand.portfolio_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#65736A] hover:text-[#138A4B] p-1"
-                      title="Portfolio Website"
-                    >
-                      <Globe className="w-4 h-4" />
-                    </a>
-                  )}
-                  {cand.github_url && (
-                    <a
-                      href={cand.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#65736A] hover:text-[#17211B] p-1"
-                      title="GitHub Profile"
-                    >
-                      <Code2 className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                {cand.portfolio_url ? (
+                  <a
+                    href={cand.portfolio_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-slate-500 hover:text-blue-600 flex items-center gap-1"
+                  >
+                    <span>Portfolio</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                ) : (
+                  <span className="text-slate-400">Profile verified</span>
+                )}
 
                 <button
-                  onClick={() => {
-                    setConnectingCandidate(cand);
-                    setConnectionFeedback(null);
-                  }}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#138A4B] text-white hover:bg-[#08663A] flex items-center gap-1.5 transition-colors"
+                  onClick={() => setConnectingCandidate(cand)}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.99] transition-all flex items-center gap-1.5 shadow-2xs"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>Connect</span>
@@ -242,34 +229,31 @@ export const FindPeoplePage: React.FC = () => {
         </div>
       )}
 
-      {/* CONNECT REQUEST MODAL */}
+      {/* CONNECT MODAL */}
       {connectingCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-[#E3EAE5] shadow-2xl w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E3EAE5]">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
-                <h3 className="font-bold text-base text-[#17211B]">
-                  Connect with {connectingCandidate.full_name}
-                </h3>
-                <p className="text-xs text-[#65736A]">{connectingCandidate.experience_level}</p>
+                <h3 className="font-bold text-base text-slate-900">Send Connection Request</h3>
+                <p className="text-xs text-slate-500">Connect with {connectingCandidate.full_name}</p>
               </div>
               <button
                 onClick={() => setConnectingCandidate(null)}
-                className="text-[#65736A] hover:text-[#17211B]"
+                className="text-slate-400 hover:text-slate-600"
               >
                 ✕
               </button>
             </div>
 
             {connectionFeedback ? (
-              <div className="p-4 bg-[#EAF7EF] text-[#08663A] rounded-xl text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5" />
-                <span>{connectionFeedback}</span>
+              <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-xs font-semibold">
+                ✓ {connectionFeedback}
               </div>
             ) : (
               <form onSubmit={handleSendConnection} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase text-[#65736A] mb-1">
+                  <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">
                     Introduction Message
                   </label>
                   <textarea
@@ -277,24 +261,24 @@ export const FindPeoplePage: React.FC = () => {
                     required
                     value={connectionMessage}
                     onChange={(e) => setConnectionMessage(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#E3EAE5] rounded-xl text-sm"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-600"
                   />
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2">
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                   <button
                     type="button"
                     onClick={() => setConnectingCandidate(null)}
-                    className="px-4 py-2 text-xs font-semibold text-[#65736A] hover:bg-gray-100 rounded-xl"
+                    className="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl"
                   >
-                    Cancel
+                    {t.cancel}
                   </button>
                   <button
                     type="submit"
                     disabled={isSendingRequest}
-                    className="px-5 py-2 text-xs font-semibold bg-[#138A4B] text-white hover:bg-[#08663A] rounded-xl disabled:opacity-50"
+                    className="px-5 py-2 text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 rounded-xl shadow-2xs"
                   >
-                    {isSendingRequest ? 'Sending...' : 'Send Request'}
+                    {isSendingRequest ? 'Sending...' : 'Send Invitation'}
                   </button>
                 </div>
               </form>
